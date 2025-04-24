@@ -74,9 +74,17 @@ You can modify these variables in `script.js`:
 
 ```javascript
 const REFRESH_INTERVAL_MINUTES = 1; // Widget refresh interval
-const BART_API_KEY = "MW9S-E7SL-26DU-VV8V"; // Replace with your API key
+const BART_API_KEY = "YOUR_API_KEY"; // Get your key from BART API website
 const SF_BORDER_MILES = 7; // Distance threshold for direction switching
 ```
+
+To get your BART API key:
+
+1. Visit [BART API Website](https://www.bart.gov/schedules/developers/api)
+2. Register for an API key
+3. Replace `YOUR_API_KEY` with your actual API key
+
+Note: The widget includes a demo API key by default, but it's recommended to get your own key for production use.
 
 ## Requirements
 
