@@ -121,14 +121,14 @@ function isEastOfSFBorder(latitude, longitude) {
 async function findClosestStation(currentLocation) {
   const stations = await loadStationList();
   let closestStation = null;
-  let minDistance = Infinity;
+  let minDistance = Number.POSITIVE_INFINITY;
 
   for (const station of stations) {
     const distance = calculateDistance(
       currentLocation.latitude,
       currentLocation.longitude,
-      parseFloat(station.gtfs_latitude),
-      parseFloat(station.gtfs_longitude)
+      Number.parseFloat(station.gtfs_latitude),
+      Number.parseFloat(station.gtfs_longitude)
     );
 
     if (distance < minDistance) {
