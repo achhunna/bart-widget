@@ -32,7 +32,7 @@
 
 // Configuration
 const REFRESH_INTERVAL_MINUTES = 1; // Widget will refresh every minute
-const BART_API_KEY = "YOUR_API_KEY"; // Get your key from https://www.bart.gov/schedules/developers/api
+const BART_API_KEY = args.widgetParameter || "YOUR_API_KEY"; // Use widget parameter or fallback
 const BART_API_BASE = "https://api.bart.gov/api";
 
 // San Francisco city center coordinates
