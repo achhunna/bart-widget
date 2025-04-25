@@ -173,6 +173,10 @@ function getLineColor(destination, direction) {
       North: "YellowE", // Antioch - Yellow Line Northbound (treated as East)
       South: "YellowW", // Antioch - Yellow Line Southbound (treated as West)
     },
+    PITT: {
+      North: "YellowE", // Pittsburg/Bay Point - Yellow Line Northbound (treated as East)
+      South: "YellowW", // Pittsburg/Bay Point - Yellow Line Southbound (treated as West)
+    },
     SFIA: {
       South: "YellowW", // SFO Airport - Yellow Line Southbound (treated as West)
       North: "YellowE", // SFO Airport - Yellow Line Northbound (treated as East)
