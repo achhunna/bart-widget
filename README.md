@@ -37,7 +37,7 @@ A real-time BART (Bay Area Rapid Transit) departure widget for iOS, built using 
 2. Download `script.js` from this repository
 3. Open Scriptable and create a new script
 4. Copy and paste the contents of `script.js` into your new script
-5. (Optional) Replace the demo API key with your own from [BART API](https://www.bart.gov/schedules/developers/api)
+5. Get your API key from [BART API](https://www.bart.gov/schedules/developers/api)
 
 ## Widget Setup
 
@@ -47,7 +47,12 @@ A real-time BART (Bay Area Rapid Transit) departure widget for iOS, built using 
 4. Choose your preferred widget size
 5. Tap the widget to configure it
 6. Select the script you created
-7. Make sure location services are enabled for Scriptable
+7. **Important**: Add your BART API key
+   - Long press the widget
+   - Choose "Edit Widget"
+   - In the "Parameter" field, paste your BART API key
+   - The widget will not function correctly without a valid API key
+8. Make sure location services are enabled for Scriptable
 
 ## Views
 
@@ -74,17 +79,23 @@ You can modify these variables in `script.js`:
 
 ```javascript
 const REFRESH_INTERVAL_MINUTES = 1; // Widget refresh interval
-const BART_API_KEY = "YOUR_API_KEY"; // Get your key from BART API website
 const SF_BORDER_MILES = 7; // Distance threshold for direction switching
 ```
 
-To get your BART API key:
+The BART API key is configured through the widget's Parameter field:
 
-1. Visit [BART API Website](https://www.bart.gov/schedules/developers/api)
-2. Register for an API key
-3. Replace `YOUR_API_KEY` with your actual API key
+```javascript
+const BART_API_KEY = args.widgetParameter || "YOUR_API_KEY"; // Uses widget parameter
+```
 
-Note: The widget includes a demo API key by default, but it's recommended to get your own key for production use.
+To set your API key:
+
+1. Get an API key from [BART API Website](https://www.bart.gov/schedules/developers/api)
+2. Long press your widget
+3. Choose "Edit Widget"
+4. Paste your API key in the "Parameter" field
+
+This approach keeps your API key secure and makes it easy to update.
 
 ## Requirements
 
