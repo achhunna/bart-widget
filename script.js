@@ -481,13 +481,90 @@ async function createTable(closest) {
   return table;
 }
 
-// Modify the main execution
-if (config.runsInWidget) {
-  const widget = await createWidget(closest);
-  Script.setWidget(widget);
-} else {
-  const table = await createTable(closest);
-  await QuickLook.present(table);
+// Create loading widget
+function createLoadingWidget(message = "Loading...") {
+  const widget = new ListWidget();
+  widget.backgroundColor = ColorScheme.background;
+  
+  const stack = widget.addStack();
+  stack.centerAlignContent();
+  
+  const loadingSymbol = stack.addImage(SFSymbol.named("arrow.2.circlepath").image);
+  loadingSymbol.imageSize = new Size(20, 20);
+  loadingSymbol.tintColor = ColorScheme.accentBlue;
+  
+  stack.addSpacer(4);
+  
+  const text = stack.addText(message);
+  text.textColor = ColorScheme.primaryText;
+  text.font = Font.systemFont(12);
+  
+  return widget;
 }
 
+// Create error widget
+function createErrorWidget(error) {
+  const widget = new ListWidget();
+  widget.backgroundColor = ColorScheme.background;
+  
+  const stack = widget.addStack();
+  stack.centerAlignContent();
+  
+  const errorSymbol = stack.addImage(SFSymbol.named("exclamationmark.triangle").image);
+  errorSymbol.imageSize = new Size(20, 20);
+  errorSymbol.tintColor = new Color("#FF3B30");
+  
+  stack.addSpacer(4);
+  
+  const text = stack.addText("Location unavailable");
+  text.textColor = ColorScheme.primaryText;
+  text.font = Font.systemFont(12);
+  
+  widget.addSpacer(4);
+  
+  const hint = widget.addText("Please enable location services for Scriptable");
+  hint.textColor = ColorScheme.secondaryText;
+  hint.font = Font.systemFont(10);
+  
+  return widget;
+}
+
+// Main execution
+async function run() {
+  if (config.runsInWidget) {
+    // Show loading widget immediately
+    const loadingWidget = createLoadingWidget();
+    await loadingWidget.presentMedium();
+    
+    try {
+      // Get location with timeout
+      const location = await Location.current();
+      const closest = await findClosestStation(location);
+      const widget = await createWidget(closest);
+      await widget.presentMedium();
+      Script.setWidget(widget);
+    } catch (error) {
+      console.error("Location error:", error);
+      const errorWidget = createErrorWidget(error);
+      await errorWidget.presentMedium();
+      Script.setWidget(errorWidget);
+    }
+  } else {
+    try {
+      const location = await Location.current();
+      const closest = await findClosestStation(location);
+      const table = await createTable(closest);
+      await QuickLook.present(table);
+    } catch (error) {
+      console.error("Location error:", error);
+      const alert = new Alert();
+      alert.title = "Location Unavailable";
+      alert.message = "Please enable location services for Scriptable in Settings.";
+      alert.addAction("OK");
+      await alert.presentAlert();
+    }
+  }
+}
+
+await run();
 Script.complete();
