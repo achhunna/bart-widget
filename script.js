@@ -503,28 +503,33 @@ function createLoadingWidget(message = "Loading...") {
 }
 
 // Create error widget
-function createErrorWidget(error) {
+function createErrorWidget() {
   const widget = new ListWidget();
   widget.backgroundColor = ColorScheme.background;
   
   const stack = widget.addStack();
   stack.centerAlignContent();
   
-  const errorSymbol = stack.addImage(SFSymbol.named("exclamationmark.triangle").image);
+  const errorSymbol = stack.addImage(SFSymbol.named("location.slash").image);
   errorSymbol.imageSize = new Size(20, 20);
-  errorSymbol.tintColor = new Color("#FF3B30");
+  errorSymbol.tintColor = ColorScheme.secondaryText;
   
   stack.addSpacer(4);
   
-  const text = stack.addText("Location unavailable");
+  const text = stack.addText("Waiting for location");
   text.textColor = ColorScheme.primaryText;
   text.font = Font.systemFont(12);
   
   widget.addSpacer(4);
   
-  const hint = widget.addText("Please enable location services for Scriptable");
+  const hint = widget.addText("Widget will update when location is available");
   hint.textColor = ColorScheme.secondaryText;
   hint.font = Font.systemFont(10);
+  
+  // Set refresh interval to try again soon
+  const refreshDate = new Date();
+  refreshDate.setMinutes(refreshDate.getMinutes() + 1);
+  widget.refreshAfterDate = refreshDate;
   
   return widget;
 }
@@ -532,21 +537,14 @@ function createErrorWidget(error) {
 // Main execution
 async function run() {
   if (config.runsInWidget) {
-    // Show loading widget immediately
-    const loadingWidget = createLoadingWidget();
-    await loadingWidget.presentMedium();
-    
     try {
-      // Get location with timeout
       const location = await Location.current();
       const closest = await findClosestStation(location);
       const widget = await createWidget(closest);
-      await widget.presentMedium();
       Script.setWidget(widget);
     } catch (error) {
-      console.error("Location error:", error);
-      const errorWidget = createErrorWidget(error);
-      await errorWidget.presentMedium();
+      // Show waiting widget and try again in a minute
+      const errorWidget = createErrorWidget();
       Script.setWidget(errorWidget);
     }
   } else {
@@ -556,10 +554,9 @@ async function run() {
       const table = await createTable(closest);
       await QuickLook.present(table);
     } catch (error) {
-      console.error("Location error:", error);
       const alert = new Alert();
-      alert.title = "Location Unavailable";
-      alert.message = "Please enable location services for Scriptable in Settings.";
+      alert.title = "Location Not Available";
+      alert.message = "Please make sure location services are enabled for Scriptable.";
       alert.addAction("OK");
       await alert.presentAlert();
     }
