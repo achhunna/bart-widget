@@ -258,6 +258,16 @@ function filterRoutesByDirection(departures, latitude, longitude) {
   return filteredDepartures;
 }
 
+// Helper function to format distance and walking time
+function formatDistanceAndTime(distanceKm) {
+  const distanceMiles = distanceKm * 0.621371; // Convert km to miles
+  const walkingTimeMinutes = Math.round(distanceKm * 12); // Assume 5km/h walking speed (12 min per km)
+  return {
+    distance: `${distanceMiles.toFixed(1)} mi`,
+    walkingTime: `${walkingTimeMinutes} min walk`
+  };
+}
+
 // Get current location and find closest station
 const currentLocation = await Location.current();
 const closest = await findClosestStation(currentLocation);
@@ -283,9 +293,21 @@ async function createWidget(closest) {
   stationName.textColor = ColorScheme.primaryText;
   stationName.font = Font.systemFont(14);
 
-  const distance = w.addText(`${closest.distance.toFixed(1)} km away`);
-  distance.textColor = ColorScheme.accentBlue;
-  distance.font = Font.systemFont(12);
+  const distanceInfo = formatDistanceAndTime(closest.distance);
+  const distanceStack = w.addStack();
+  distanceStack.spacing = 4;
+
+  const distanceText = distanceStack.addText(distanceInfo.distance);
+  distanceText.textColor = ColorScheme.accentBlue;
+  distanceText.font = Font.systemFont(12);
+
+  const bulletPoint = distanceStack.addText("•");
+  bulletPoint.textColor = ColorScheme.secondaryText;
+  bulletPoint.font = Font.systemFont(12);
+
+  const walkingText = distanceStack.addText(distanceInfo.walkingTime);
+  walkingText.textColor = ColorScheme.secondaryText;
+  walkingText.font = Font.systemFont(12);
 
   // Direction indicator with distance from SF
   const distanceFromSF = calculateDistanceFromSF(
@@ -397,8 +419,9 @@ async function createTable(closest) {
   table.addRow(header);
 
   const stationRow = new UITableRow();
+  const distanceInfo = formatDistanceAndTime(closest.distance);
   stationRow.addText(closest.station.name);
-  stationRow.addText(`${closest.distance.toFixed(1)} km`);
+  stationRow.addText(`${distanceInfo.distance} (${distanceInfo.walkingTime})`);
   table.addRow(stationRow);
 
   const addressRow = new UITableRow();
