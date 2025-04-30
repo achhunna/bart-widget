@@ -397,9 +397,8 @@ async function createWidget(closest) {
   footer.addSpacer(2);
 
   const now = new Date();
-  const nextUpdate = new Date(now.getTime() + REFRESH_INTERVAL_MINUTES * 60000);
   const timestamp = footer.addText(
-    `Updated ${formatLastUpdated(now)} (next: ${formatLastUpdated(nextUpdate)})`
+    `Updated ${formatLastUpdated(now)}`
   );
   timestamp.textColor = ColorScheme.secondaryText;
   timestamp.font = Font.systemFont(10);
@@ -448,15 +447,10 @@ async function createTable(closest) {
 
   // Last updated timestamp
   const now = new Date();
-  const nextUpdate = new Date(now.getTime() + REFRESH_INTERVAL_MINUTES * 60000);
   const updateRow = new UITableRow();
   updateRow.backgroundColor = ColorScheme.rowBackground;
   updateRow.addText(
-    `Last Updated: ${formatLastUpdated(
-      now
-    )}\nNext update in ${REFRESH_INTERVAL_MINUTES} minutes (${formatLastUpdated(
-      nextUpdate
-    )})`
+    `Last Updated: ${formatLastUpdated(now)}`
   );
   table.addRow(updateRow);
 
