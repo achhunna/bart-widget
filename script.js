@@ -17,7 +17,7 @@
  * DISPLAY INFORMATION
  * - Station name and distance from your location
  * - Train line colors with direction arrows (→● or ●←)
- * - Next departure times with actual departure time (e.g., "5 min (3:45 PM)")
+ * - Next departure times shown as actual times (e.g., "3:45 PM")
  * - Distance from San Francisco
  * - Last updated timestamp
  *
@@ -361,7 +361,7 @@ async function createWidget(closest) {
       // Next train info
       const nextTrain = trains[0];
       const trainInfo = lineStack.addText(
-        `${nextTrain.destination}: ${nextTrain.minutes} min (${nextTrain.departureTime})`
+        `${nextTrain.destination}: ${nextTrain.departureTime}`
       );
       trainInfo.textColor = ColorScheme.primaryText;
       trainInfo.font = Font.systemFont(12);
@@ -370,7 +370,7 @@ async function createWidget(closest) {
         const nextTrains = lineStack.addText(
           ` +${trains
             .slice(1, 3)
-            .map((t) => `${t.minutes}m (${t.departureTime})`)
+            .map((t) => t.departureTime)
             .join(", ")}`
         );
         nextTrains.textColor = ColorScheme.secondaryText;
@@ -484,7 +484,7 @@ async function createTable(closest) {
       for (const train of trains.slice(0, 3)) {
         const trainRow = new UITableRow();
         trainRow.addText(train.destination);
-        trainRow.addText(`${train.minutes} min (${train.departureTime})`);
+        trainRow.addText(train.departureTime);
         trainRow.addText(`${train.length} car`);
         trainRow.addText(train.direction);
         table.addRow(trainRow);
