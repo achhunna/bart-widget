@@ -20,6 +20,7 @@ A real-time BART (Bay Area Rapid Transit) departure widget for iOS, built using 
   - Shows next train in both minutes and actual time
   - Displays additional trains with actual times
   - Shows last updated timestamp
+  - Automatically sorts trains by earliest departure time
 - 📍 **Location Context**:
   - Shows station name and distance from your location
   - Indicates walking time to station
@@ -64,6 +65,7 @@ A real-time BART (Bay Area Rapid Transit) departure widget for iOS, built using 
 - Color-coded line indicators with direction arrows
 - Next train shown in minutes and actual time (e.g., "5 min (3:45 PM)")
 - Additional trains shown with actual times
+- All trains sorted by departure time
 - Last updated timestamp
 - Walking distance and time to station
 
@@ -76,6 +78,7 @@ A real-time BART (Bay Area Rapid Transit) departure widget for iOS, built using 
   - Next train in minutes and actual time, additional trains in actual times
   - Train length (number of cars)
   - Direction
+- All trains sorted chronologically by departure time
 
 ## Configuration
 

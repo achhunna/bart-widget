@@ -13,11 +13,13 @@
  *    - East of SF: Shows eastbound trains
  *    - West of SF: Shows westbound trains
  * 3. Updates every minute with fresh departure times
+ * 4. Sorts all trains by earliest departure time
  *
  * DISPLAY INFORMATION
  * - Station name and distance from your location
  * - Train line colors with direction arrows (→● or ●←)
  * - Next train shown in minutes and actual time (e.g., "5 min (3:45 PM)")
+ * - Additional trains sorted by departure time
  * - Distance from San Francisco
  * - Last updated timestamp
  *
@@ -229,11 +231,17 @@ function formatDepartures(etd) {
           destination: destination.destination,
           minutes: estimate.minutes,
           departureTime: formatLastUpdated(departureTime),
+          actualDepartureTime: departureTime, // Store actual Date object for sorting
           length: estimate.length,
           direction: estimate.direction,
         });
       }
     }
+  }
+
+  // Sort each line's departures by time
+  for (const line in departures) {
+    departures[line].sort((a, b) => a.actualDepartureTime - b.actualDepartureTime);
   }
 
   return departures;
@@ -252,12 +260,27 @@ function filterRoutesByDirection(departures, latitude, longitude) {
   const isEast = isEastOfSFBorder(latitude, longitude);
   const filteredDepartures = {};
 
+  // Get all trains and their line colors
+  const allTrains = [];
   for (const [color, trains] of Object.entries(departures)) {
-    filteredDepartures[color] = trains.filter((train) => {
-      const isEastbound =
-        train.direction === "South" || train.direction === "East";
-      return isEast ? isEastbound : !isEastbound;
-    });
+    const isEastbound = color.endsWith("E");
+    if ((isEast && isEastbound) || (!isEast && !isEastbound)) {
+      for (const train of trains) {
+        allTrains.push({...train, lineColor: color});
+      }
+    }
+  }
+
+  // Sort all trains by departure time
+  allTrains.sort((a, b) => a.actualDepartureTime - b.actualDepartureTime);
+
+  // Reorganize back into line colors
+  for (const train of allTrains) {
+    const color = train.lineColor;
+    if (!filteredDepartures[color]) {
+      filteredDepartures[color] = [];
+    }
+    filteredDepartures[color].push(train);
   }
 
   return filteredDepartures;
