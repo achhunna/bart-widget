@@ -8,9 +8,9 @@ A real-time BART (Bay Area Rapid Transit) departure widget for iOS, built using 
 
 - 🚉 **Automatic Station Detection**: Finds the closest BART station using your current location
 - 🚂 **Smart Direction Display**:
+  - East of SF: Shows only eastbound trains
+  - West of SF: Shows only westbound trains
   - Within 7 miles of SF: Shows westbound trains
-  - East of SF: Shows eastbound trains
-  - West of SF: Shows westbound trains
 - 🎨 **Dynamic Styling**:
   - Supports both light and dark mode
   - Color-coded train lines with direction arrows (→● or ●←)
@@ -25,7 +25,7 @@ A real-time BART (Bay Area Rapid Transit) departure widget for iOS, built using 
   - Shows station name and distance from your location
   - Indicates walking time to station
   - Shows distance from San Francisco
-  - Displays relevant train directions based on your location
+  - Displays only trains heading in relevant direction based on your location
 
 ## Supported Train Lines
 

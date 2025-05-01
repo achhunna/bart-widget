@@ -9,9 +9,9 @@
  * The widget automatically:
  * 1. Finds your nearest BART station using your current location
  * 2. Shows trains based on your position relative to San Francisco:
+ *    - East of SF: Shows only eastbound trains
+ *    - West of SF: Shows only westbound trains
  *    - Within 7 miles of SF: Shows westbound trains
- *    - East of SF: Shows eastbound trains
- *    - West of SF: Shows westbound trains
  * 3. Updates every minute with fresh departure times
  * 4. Sorts all trains by earliest departure time
  *
@@ -22,6 +22,7 @@
  * - Additional trains sorted by departure time
  * - Distance from San Francisco
  * - Last updated timestamp
+ * - Only shows trains heading in relevant direction based on your location
  *
  * SUPPORTED LINES
  * Red (Richmond ↔ Millbrae), Yellow (Antioch ↔ SFO),
@@ -263,9 +264,12 @@ function filterRoutesByDirection(departures, latitude, longitude) {
   // Get all trains and their line colors
   const allTrains = [];
   for (const [color, trains] of Object.entries(departures)) {
-    const isEastbound = color.endsWith("E");
-    if ((isEast && isEastbound) || (!isEast && !isEastbound)) {
-      for (const train of trains) {
+    for (const train of trains) {
+      // Determine if the train is eastbound based on its direction
+      const isTrainEastbound = train.direction === "South" || train.direction === "East";
+      
+      // Only add trains going in the correct direction based on location
+      if ((isEast && isTrainEastbound) || (!isEast && !isTrainEastbound)) {
         allTrains.push({...train, lineColor: color});
       }
     }
