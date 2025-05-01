@@ -12,13 +12,14 @@
  *    - Within 7 miles of SF: Shows westbound trains
  *    - East of SF: Shows eastbound trains
  *    - West of SF: Shows westbound trains
- * 3. Updates every 2 minutes with fresh departure times
+ * 3. Updates every minute with fresh departure times
  *
  * DISPLAY INFORMATION
  * - Station name and distance from your location
  * - Train line colors with direction arrows (→● or ●←)
- * - Next departure times for each line
+ * - Next departure times with actual departure time (e.g., "5 min (3:45 PM)")
  * - Distance from San Francisco
+ * - Last updated timestamp
  *
  * SUPPORTED LINES
  * Red (Richmond ↔ Millbrae), Yellow (Antioch ↔ SFO),
