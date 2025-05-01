@@ -214,6 +214,8 @@ function formatDepartures(etd) {
     GreenW: [], // Westbound Green Line
   };
 
+  const now = new Date();
+  
   for (const destination of etd) {
     for (const estimate of destination.estimate) {
       const lineColor = getLineColor(
@@ -221,9 +223,11 @@ function formatDepartures(etd) {
         estimate.direction
       );
       if (lineColor in departures) {
+        const departureTime = new Date(now.getTime() + (Number.parseInt(estimate.minutes) * 60000));
         departures[lineColor].push({
           destination: destination.destination,
           minutes: estimate.minutes,
+          departureTime: formatLastUpdated(departureTime),
           length: estimate.length,
           direction: estimate.direction,
         });
@@ -356,7 +360,7 @@ async function createWidget(closest) {
       // Next train info
       const nextTrain = trains[0];
       const trainInfo = lineStack.addText(
-        `${nextTrain.destination}: ${nextTrain.minutes} min`
+        `${nextTrain.destination}: ${nextTrain.minutes} min (${nextTrain.departureTime})`
       );
       trainInfo.textColor = ColorScheme.primaryText;
       trainInfo.font = Font.systemFont(12);
@@ -365,7 +369,7 @@ async function createWidget(closest) {
         const nextTrains = lineStack.addText(
           ` +${trains
             .slice(1, 3)
-            .map((t) => t.minutes)
+            .map((t) => `${t.minutes}m (${t.departureTime})`)
             .join(", ")}`
         );
         nextTrains.textColor = ColorScheme.secondaryText;
@@ -479,7 +483,7 @@ async function createTable(closest) {
       for (const train of trains.slice(0, 3)) {
         const trainRow = new UITableRow();
         trainRow.addText(train.destination);
-        trainRow.addText(`${train.minutes} min`);
+        trainRow.addText(`${train.minutes} min (${train.departureTime})`);
         trainRow.addText(`${train.length} car`);
         trainRow.addText(train.direction);
         table.addRow(trainRow);
