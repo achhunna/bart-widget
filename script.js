@@ -341,22 +341,11 @@ async function createWidget(closest) {
   walkingText.textColor = ColorScheme.secondaryText;
   walkingText.font = Font.systemFont(12);
 
-  // Direction indicator with distance from SF
+  // Direction indicator
   const distanceFromSF = calculateDistanceFromSF(
     currentLocation.latitude,
     currentLocation.longitude
   );
-  const direction = isEastOfSFBorder(
-    currentLocation.latitude,
-    currentLocation.longitude
-  )
-    ? "Eastbound"
-    : "Westbound";
-  const directionText = w.addText(
-    `${direction} (${distanceFromSF.toFixed(1)} mi from SF)`
-  );
-  directionText.textColor = ColorScheme.accentBlue;
-  directionText.font = Font.systemFont(12);
 
   w.addSpacer(8);
 
@@ -459,23 +448,11 @@ async function createTable(closest) {
   addressRow.addText(closest.station.address);
   table.addRow(addressRow);
 
-  // Direction indicator with SF distance
+  // Calculate distance from SF for direction determination (but don't display)
   const distanceFromSF = calculateDistanceFromSF(
     currentLocation.latitude,
     currentLocation.longitude
   );
-  const direction = isEastOfSFBorder(
-    currentLocation.latitude,
-    currentLocation.longitude
-  )
-    ? "Eastbound"
-    : "Westbound";
-  const directionRow = new UITableRow();
-  directionRow.backgroundColor = ColorScheme.rowBackground;
-  directionRow.addText(
-    `${direction} (${distanceFromSF.toFixed(1)} mi from SF)`
-  );
-  table.addRow(directionRow);
 
   // Last updated timestamp
   const now = new Date();
@@ -502,9 +479,8 @@ async function createTable(closest) {
       hasTrains = true;
       const lineHeader = new UITableRow();
       const isEastbound = color.endsWith("E");
-      const direction = isEastbound ? "Eastbound" : "Westbound";
       const lineName = color.slice(0, -1); // Remove E/W suffix
-      lineHeader.addText(`${lineName} Line (${direction})`);
+      lineHeader.addText(`${lineName} Line`);
       lineHeader.backgroundColor = ColorScheme.rowBackground;
       table.addRow(lineHeader);
 
