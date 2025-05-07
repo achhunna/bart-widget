@@ -453,7 +453,7 @@ async function createWidget(closest, location) {
   const footer = w.addStack();
   footer.centerAlignContent();
 
-  const updateIcon = footer.addImage(SFSymbol.named("arrow.clockwise").image);
+  const updateIcon = footer.addImage(SFSymbol.named("clock").image);
   updateIcon.imageSize = new Size(10, 10);
   updateIcon.tintColor = ColorScheme.secondaryText;
 
@@ -461,7 +461,7 @@ async function createWidget(closest, location) {
 
   const now = new Date();
   const timestamp = footer.addText(
-    `Updated ${formatLastUpdated(now)}`
+    `Last Updated ${formatLastUpdated(now)}`
   );
   timestamp.textColor = ColorScheme.secondaryText;
   timestamp.font = Font.systemFont(10);
