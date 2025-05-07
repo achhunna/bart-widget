@@ -94,10 +94,22 @@ const ColorScheme = {
 };
 
 async function loadStationList() {
-  const url = `${BART_API_BASE}/stn.aspx?cmd=stns&key=${BART_API_KEY}&json=y`;
-  const req = new Request(url);
-  const json = await req.loadJSON();
-  return json.root.stations.station;
+  try {
+    const url = `${BART_API_BASE}/stn.aspx?cmd=stns&key=${BART_API_KEY}&json=y`;
+    const req = new Request(url);
+    const json = await req.loadJSON();
+    
+    // Validate response structure
+    if (!json || !json.root || !json.root.stations || !json.root.stations.station) {
+      console.log('Invalid API response structure:', json);
+      throw new Error('Invalid BART API response structure');
+    }
+    
+    return json.root.stations.station;
+  } catch (error) {
+    console.log('Error loading station list:', error);
+    throw error;
+  }
 }
 
 function calculateDistanceFromSF(latitude, longitude) {
@@ -163,10 +175,22 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 async function getStationDepartures(station) {
-  const url = `${BART_API_BASE}/etd.aspx?cmd=etd&orig=${station.abbr}&key=${BART_API_KEY}&json=y`;
-  const req = new Request(url);
-  const json = await req.loadJSON();
-  return json.root.station[0].etd;
+  try {
+    const url = `${BART_API_BASE}/etd.aspx?cmd=etd&orig=${station.abbr}&key=${BART_API_KEY}&json=y`;
+    const req = new Request(url);
+    const json = await req.loadJSON();
+    
+    // Validate response structure
+    if (!json || !json.root || !json.root.station || !json.root.station[0] || !json.root.station[0].etd) {
+      console.log('Invalid API response structure:', json);
+      throw new Error('Invalid BART API response structure');
+    }
+    
+    return json.root.station[0].etd;
+  } catch (error) {
+    console.log('Error getting station departures:', error);
+    throw error;
+  }
 }
 
 function getLineColor(destination, direction) {
@@ -300,12 +324,30 @@ function formatDistanceAndTime(distanceKm) {
   };
 }
 
-// Get current location and find closest station
-const currentLocation = await Location.current();
-const closest = await findClosestStation(currentLocation);
+// Store and retrieve last known location
+function storeLastLocation(location) {
+  const locationData = {
+    latitude: location.latitude,
+    longitude: location.longitude,
+    timestamp: new Date().getTime()
+  };
+  Keychain.set('lastKnownLocation', JSON.stringify(locationData));
+}
+
+function getLastLocation() {
+  try {
+    const locationData = Keychain.get('lastKnownLocation');
+    if (locationData) {
+      return JSON.parse(locationData);
+    }
+  } catch (error) {
+    console.log('Error retrieving last location:', error);
+  }
+  return null;
+}
 
 // Create widget
-async function createWidget(closest) {
+async function createWidget(closest, location) {
   const w = new ListWidget();
   w.backgroundColor = ColorScheme.background;
 
@@ -343,8 +385,8 @@ async function createWidget(closest) {
 
   // Direction indicator
   const distanceFromSF = calculateDistanceFromSF(
-    currentLocation.latitude,
-    currentLocation.longitude
+    location.latitude,
+    location.longitude
   );
 
   w.addSpacer(8);
@@ -354,8 +396,8 @@ async function createWidget(closest) {
   const allDepartures = formatDepartures(etd);
   const departures = filterRoutesByDirection(
     allDepartures,
-    currentLocation.latitude,
-    currentLocation.longitude
+    location.latitude,
+    location.longitude
   );
 
   let hasTrains = false;
@@ -400,7 +442,7 @@ async function createWidget(closest) {
   // Show message if no trains in desired direction
   if (!hasTrains) {
     const noTrains = w.addText(
-      `No ${direction.toLowerCase()} trains at this time`
+      'No trains at this time'
     );
     noTrains.textColor = ColorScheme.secondaryText;
     noTrains.font = Font.systemFont(12);
@@ -428,7 +470,7 @@ async function createWidget(closest) {
 }
 
 // Modify table view
-async function createTable(closest) {
+async function createTable(closest, location) {
   const table = new UITable();
   table.showSeparators = true;
 
@@ -450,8 +492,8 @@ async function createTable(closest) {
 
   // Calculate distance from SF for direction determination (but don't display)
   const distanceFromSF = calculateDistanceFromSF(
-    currentLocation.latitude,
-    currentLocation.longitude
+    location.latitude,
+    location.longitude
   );
 
   // Last updated timestamp
@@ -468,8 +510,8 @@ async function createTable(closest) {
   const allDepartures = formatDepartures(etd);
   const departures = filterRoutesByDirection(
     allDepartures,
-    currentLocation.latitude,
-    currentLocation.longitude
+    location.latitude,
+    location.longitude
   );
 
   // Add section for each line color
@@ -498,7 +540,7 @@ async function createTable(closest) {
   // Show message if no trains in desired direction
   if (!hasTrains) {
     const noTrainsRow = new UITableRow();
-    noTrainsRow.addText(`No ${direction.toLowerCase()} trains at this time`);
+    noTrainsRow.addText('No trains at this time');
     noTrainsRow.textColor = Color.gray;
     table.addRow(noTrainsRow);
   }
@@ -563,26 +605,104 @@ function createErrorWidget() {
 async function run() {
   if (config.runsInWidget) {
     try {
-      const location = await Location.current();
-      const closest = await findClosestStation(location);
-      const widget = await createWidget(closest);
-      Script.setWidget(widget);
+      // First try to get current location
+      let location;
+      try {
+        location = await Location.current();
+        storeLastLocation(location);
+      } catch (error) {
+        console.log('Error getting current location:', error);
+        location = getLastLocation();
+        if (!location) {
+          throw new Error('No location available');
+        }
+      }
+
+      // Then try to get station data
+      try {
+        const closest = await findClosestStation(location);
+        const widget = await createWidget(closest, location);
+        if (location === getLastLocation()) {
+          // Add cached location note
+          const footer = widget.addStack();
+          footer.centerAlignContent();
+          const cacheNote = footer.addText('Using last known location');
+          cacheNote.textColor = ColorScheme.secondaryText;
+          cacheNote.font = Font.systemFont(8);
+        }
+        Script.setWidget(widget);
+      } catch (error) {
+        console.log('Error creating widget:', error);
+        const errorWidget = new ListWidget();
+        errorWidget.backgroundColor = ColorScheme.background;
+        
+        const stack = errorWidget.addStack();
+        stack.centerAlignContent();
+        
+        const errorSymbol = stack.addImage(SFSymbol.named('exclamationmark.triangle').image);
+        errorSymbol.imageSize = new Size(20, 20);
+        errorSymbol.tintColor = ColorScheme.secondaryText;
+        
+        stack.addSpacer(4);
+        
+        const text = stack.addText('BART API Error');
+        text.textColor = ColorScheme.primaryText;
+        text.font = Font.systemFont(12);
+        
+        errorWidget.addSpacer(4);
+        
+        const hint = errorWidget.addText('Please check your API key and internet connection');
+        hint.textColor = ColorScheme.secondaryText;
+        hint.font = Font.systemFont(10);
+        
+        Script.setWidget(errorWidget);
+      }
     } catch (error) {
-      // Show waiting widget and try again in a minute
+      console.log('Widget error:', error);
       const errorWidget = createErrorWidget();
       Script.setWidget(errorWidget);
     }
   } else {
     try {
-      const location = await Location.current();
-      const closest = await findClosestStation(location);
-      const table = await createTable(closest);
-      await QuickLook.present(table);
+      // First try to get current location
+      let location;
+      try {
+        location = await Location.current();
+        storeLastLocation(location);
+      } catch (error) {
+        console.log('Error getting current location:', error);
+        location = getLastLocation();
+        if (!location) {
+          throw new Error('No location available');
+        }
+      }
+
+      // Then try to get station data
+      try {
+        const closest = await findClosestStation(location);
+        const table = await createTable(closest, location);
+        if (location === getLastLocation()) {
+          // Add cached location note
+          const cacheRow = new UITableRow();
+          cacheRow.backgroundColor = ColorScheme.rowBackground;
+          cacheRow.addText('Using last known location');
+          table.addRow(cacheRow);
+        }
+        await QuickLook.present(table);
+      } catch (error) {
+        console.log('Error creating table:', error);
+        const alert = new Alert();
+        alert.title = 'BART API Error';
+        alert.message = 'Please check your API key and internet connection';
+        alert.addAction('OK');
+        await alert.presentAlert();
+      }
     } catch (error) {
+      console.log('Table view error:', error);
       const alert = new Alert();
-      alert.title = "Location Not Available";
-      alert.message = "Please make sure location services are enabled for Scriptable.";
-      alert.addAction("OK");
+      alert.title = 'Location Not Available';
+      alert.message = 'Please make sure location services are enabled for Scriptable.';
+      alert.addAction('OK');
       await alert.presentAlert();
     }
   }

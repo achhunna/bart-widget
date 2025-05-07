@@ -7,6 +7,10 @@ A real-time BART (Bay Area Rapid Transit) departure widget for iOS, built using 
 ## Features
 
 - 🚉 **Automatic Station Detection**: Finds the closest BART station using your current location
+- 🔄 **Location Caching**:
+  - Stores your last known location
+  - Continues working even when location services are temporarily unavailable
+  - Clearly indicates when using cached location data
 - 🚂 **Smart Direction Display**:
   - East of SF: Shows only eastbound trains
   - West of SF: Shows only westbound trains
@@ -26,6 +30,11 @@ A real-time BART (Bay Area Rapid Transit) departure widget for iOS, built using 
   - Indicates walking time to station
   - Shows distance from San Francisco
   - Displays only trains heading in relevant direction based on your location
+- ⚠️ **Error Handling**:
+  - Graceful fallback to cached location when location services fail
+  - Clear error messages for API issues
+  - Helpful troubleshooting suggestions
+  - Detailed logging for debugging
 
 ## Supported Train Lines
 
@@ -68,6 +77,7 @@ A real-time BART (Bay Area Rapid Transit) departure widget for iOS, built using 
 - All trains sorted by departure time
 - Last updated timestamp
 - Walking distance and time to station
+- Indicator when using cached location
 
 ### Detailed View (Table)
 
@@ -79,6 +89,7 @@ A real-time BART (Bay Area Rapid Transit) departure widget for iOS, built using 
   - Train length (number of cars)
   - Direction
 - All trains sorted chronologically by departure time
+- Indicator when using cached location
 
 ## Configuration
 
@@ -104,12 +115,29 @@ To set your API key:
 
 This approach keeps your API key secure and makes it easy to update.
 
+## Troubleshooting
+
+### Location Issues
+
+- If location services are temporarily unavailable, the widget will use your last known location
+- A note will appear indicating that cached location is being used
+- To fix: Enable location services for Scriptable in iOS Settings
+
+### API Issues
+
+- If you see a BART API error:
+  1. Verify your API key is correct
+  2. Check your internet connection
+  3. Try accessing the BART API directly to verify service status
+- The widget will show specific error messages to help diagnose issues
+
 ## Requirements
 
 - iOS 14.0 or later
 - [Scriptable](https://scriptable.app/) app installed
 - Location services enabled
 - Internet connection for real-time updates
+- Valid BART API key
 
 ## Privacy
 
@@ -117,7 +145,14 @@ This widget requires:
 
 - Location access to find the nearest station
 - Internet access to fetch BART API data
-  No personal data is collected or stored.
+- Keychain access to store last known location
+
+Your location data is:
+
+- Only stored locally on your device
+- Used only to find the nearest station
+- Cached to provide service during temporary location outages
+- Never transmitted to third parties
 
 ## Credits
 
