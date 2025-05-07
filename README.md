@@ -2,7 +2,7 @@
 
 A real-time BART (Bay Area Rapid Transit) departure widget for iOS, built using the [Scriptable](https://scriptable.app/) app. This widget automatically finds your nearest BART station and displays upcoming train departures, making it perfect for Bay Area commuters.
 
-![BART Widget Preview](https://user-images.githubusercontent.com/your-username/bart-widget/preview.png)
+![BART Widget Preview](iphone.jpeg)
 
 ## Features
 
