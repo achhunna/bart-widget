@@ -168,9 +168,12 @@ If you encounter any issues or have suggestions for improvements, please open an
 
 ### Latest Updates
 
-- Fixed time display for midnight (12:00 AM) to show correctly instead of "12:NaN AM"
-- Improved time formatting logic to handle all hours consistently
-- All times now display in proper 12-hour format with AM/PM indicators
+- Fixed time display for midnight (0:00) to show correctly as "12:00 AM" instead of "NaN:NaN AM"
+- Simplified time formatting logic to handle all edge cases consistently
+- All times now display in proper 12-hour format with AM/PM indicators:
+  - Midnight (0:00) shows as "12:00 AM"
+  - Noon (12:00) shows as "12:00 PM"
+  - All other times show in standard 12-hour format
 
 ## License
 
