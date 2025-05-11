@@ -160,10 +160,18 @@ Your location data is:
 - BART API: [https://www.bart.gov/schedules/developers/api](https://www.bart.gov/schedules/developers/api)
 - Scriptable: [https://scriptable.app/](https://scriptable.app/)
 
-## License
-
-MIT License - feel free to modify and share!
-
 ## Support
 
 If you encounter any issues or have suggestions for improvements, please open an issue in this repository.
+
+## Changelog
+
+### Latest Updates
+
+- Fixed time display for midnight (12:00 AM) to show correctly instead of "12:NaN AM"
+- Improved time formatting logic to handle all hours consistently
+- All times now display in proper 12-hour format with AM/PM indicators
+
+## License
+
+MIT License - feel free to modify and share!

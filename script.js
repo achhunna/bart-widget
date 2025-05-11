@@ -276,7 +276,7 @@ function formatLastUpdated(date) {
   const hours = date.getHours();
   const minutes = date.getMinutes();
   const ampm = hours >= 12 ? "PM" : "AM";
-  const displayHours = hours % 12 || 12;
+  const displayHours = hours === 0 ? 12 : (hours > 12 ? hours % 12 : hours);
   const displayMinutes = minutes < 10 ? `0${minutes}` : minutes;
   return `${displayHours}:${displayMinutes} ${ampm}`;
 }
