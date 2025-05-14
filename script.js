@@ -548,27 +548,6 @@ async function createTable(closest, location) {
   return table;
 }
 
-// Create loading widget
-function createLoadingWidget(message = "Loading...") {
-  const widget = new ListWidget();
-  widget.backgroundColor = ColorScheme.background;
-  
-  const stack = widget.addStack();
-  stack.centerAlignContent();
-  
-  const loadingSymbol = stack.addImage(SFSymbol.named("arrow.2.circlepath").image);
-  loadingSymbol.imageSize = new Size(20, 20);
-  loadingSymbol.tintColor = ColorScheme.accentBlue;
-  
-  stack.addSpacer(4);
-  
-  const text = stack.addText(message);
-  text.textColor = ColorScheme.primaryText;
-  text.font = Font.systemFont(12);
-  
-  return widget;
-}
-
 // Create error widget
 function createErrorWidget() {
   const widget = new ListWidget();
