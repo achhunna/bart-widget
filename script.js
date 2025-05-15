@@ -419,7 +419,7 @@ async function createWidget(closest, location) {
       // Next train info
       const nextTrain = trains[0];
       const trainInfo = lineStack.addText(
-        `${nextTrain.destination}: ${nextTrain.minutes} min (${nextTrain.departureTime})`
+        `${nextTrain.destination}: ${nextTrain.minutes === "0" || Number.isNaN(nextTrain.minutes) ? "Leaving Now" : `${nextTrain.minutes} min (${nextTrain.departureTime})`}`
       );
       trainInfo.textColor = ColorScheme.primaryText;
       trainInfo.font = Font.systemFont(12);
@@ -529,7 +529,9 @@ async function createTable(closest, location) {
       for (const train of trains.slice(0, 3)) {
         const trainRow = new UITableRow();
         trainRow.addText(train.destination);
-        trainRow.addText(train === trains[0] ? `${train.minutes} min (${train.departureTime})` : train.departureTime);
+        trainRow.addText(train === trains[0] ? 
+          (train.minutes === "0" || Number.isNaN(nextTrain.minutes) ? "Leaving Now" : `${train.minutes} min (${train.departureTime})`) 
+          : train.departureTime);
         trainRow.addText(`${train.length} car`);
         trainRow.addText(train.direction);
         table.addRow(trainRow);
